@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\DrawingController.cs" />
     <Compile Include="Controllers\TwilioController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -109,6 +110,7 @@
     <Compile Include="Models\Prize.cs" />
     <Compile Include="Models\Ticket.cs" />
     <Compile Include="Models\Winner.cs" />
+    <Compile Include="Primatives\WinnerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
