@@ -27,6 +27,9 @@ namespace DoorPrize.Services.Controllers
             const string REGISTERED =
                 "You're registered to win a door prize in {0}'s {1:MM/dd/yyyy} drawing.  Good luck!!";
 
+            const string DRAWINGCLOSED =
+                "{0}'s {1:MM/dd/yyyy} door prize drawing is closed and can accept no more entries!";
+
             const string BADBODY =
                 "To register to win a door prize, please send an SMS in the format EMAIL,NAME (i.e. somedude@someco.com,Some Dude) to {0}.";
 
@@ -50,10 +53,10 @@ namespace DoorPrize.Services.Controllers
             if (parts.Length != 2)
                 return GetResponse(BADBODY, from);
 
-            if(!emailRegex.IsMatch(parts[0]))
+            if (!emailRegex.IsMatch(parts[0]))
                 return GetResponse(BADBODY, from);
 
-            if(string.IsNullOrWhiteSpace(parts[1]))
+            if (string.IsNullOrWhiteSpace(parts[1]))
                 return GetResponse(BADBODY, from);
 
             var email = parts[0];
@@ -69,32 +72,33 @@ namespace DoorPrize.Services.Controllers
                 if (account == null)
                     return GetResponse(BADPHONE, "To");
 
-                var contest = db.Contests.FirstOrDefault(
+                var drawing = db.Drawings.FirstOrDefault(
                     c => c.AccountId == account.Id && c.Date == DateTime.Today);
 
-                if (contest == null)
+                if (drawing == null)
                 {
-                    contest = new Contest()
+                    drawing = new Drawing()
                     {
                         AccountId = account.Id,
                         Date = DateTime.Today
                     };
 
-                    db.Contests.Add(contest);
+                    db.Drawings.Add(drawing);
 
                     await db.SaveChangesAsync();
                 }
 
-                // handle closed contests!!!!!!!!!!!!!!!
+                if (db.Winners.Any(w => w.Prize.DrawingId == drawing.Id))
+                    return GetResponse(DRAWINGCLOSED, account.Name, drawing.Date);
 
-                var ticket = db.Tickets.FirstOrDefault(t => 
-                    t.ContestId == contest.Id && t.Phone == from);
+                var ticket = db.Tickets.FirstOrDefault(t =>
+                    t.DrawingId == drawing.Id && t.Phone == from);
 
                 if (ticket == null)
                 {
                     ticket = new Ticket()
                     {
-                        ContestId = contest.Id,
+                        DrawingId = drawing.Id,
                         Email = email,
                         Name = name,
                         Phone = from
@@ -110,7 +114,7 @@ namespace DoorPrize.Services.Controllers
 
                 await db.SaveChangesAsync();
 
-                return GetResponse(REGISTERED, account.Name, contest.Date);
+                return GetResponse(REGISTERED, account.Name, drawing.Date);
             }
         }
 

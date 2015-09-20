@@ -5,17 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DoorPrize.Services.Models
 {
-    public class Contest
+    public class Drawing
     {
         public int Id { get; set; }
 
         [Required]
-        [Index("IX_Contest_AccountId_Date", IsUnique = true, Order = 1)]
+        [Index("IX_Drawing_AccountId_Date", IsUnique = true, Order = 1)]
         public int AccountId { get; set; }
 
         [Required]
-        [CustomValidation(typeof(Contest), "ValidateDate")]
-        [Index("IX_Contest_AccountId_Date", IsUnique = true, Order = 2)]
+        [CustomValidation(typeof(Drawing), "ValidateDate")]
+        [Index("IX_Drawing_AccountId_Date", IsUnique = true, Order = 2)]
         public DateTime Date { get; set; }
 
         public virtual Account Account { get; set; }

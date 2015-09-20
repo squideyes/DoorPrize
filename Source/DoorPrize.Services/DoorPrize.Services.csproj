@@ -98,13 +98,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201509192242334_Initial.cs" />
-    <Compile Include="Migrations\201509192242334_Initial.Designer.cs">
-      <DependentUpon>201509192242334_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201509200009261_Initial.cs" />
+    <Compile Include="Migrations\201509200009261_Initial.Designer.cs">
+      <DependentUpon>201509200009261_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\Contest.cs" />
+    <Compile Include="Models\Drawing.cs" />
     <Compile Include="Models\Entities.cs" />
     <Compile Include="Models\Prize.cs" />
     <Compile Include="Models\Ticket.cs" />
@@ -125,8 +125,8 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201509192242334_Initial.resx">
-      <DependentUpon>201509192242334_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201509200009261_Initial.resx">
+      <DependentUpon>201509200009261_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

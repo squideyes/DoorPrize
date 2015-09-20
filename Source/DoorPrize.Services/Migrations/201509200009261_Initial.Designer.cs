@@ -13,7 +13,7 @@ namespace DoorPrize.Services.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201509192242334_Initial"; }
+            get { return "201509200009261_Initial"; }
         }
         
         string IMigrationMetadata.Source

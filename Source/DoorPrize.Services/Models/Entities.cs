@@ -11,7 +11,7 @@ namespace DoorPrize.Services.Models
         }
 
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<Contest> Contests { get; set; }
+        public DbSet<Drawing> Drawings { get; set; }
         public DbSet<Prize> Prizes { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Winner> Winners { get; set; }
@@ -28,14 +28,14 @@ namespace DoorPrize.Services.Models
             modelBuilder.Entity<Ticket>().Property(e => e.Phone).IsUnicode(false);
             modelBuilder.Entity<Ticket>().Property(e => e.Email).IsUnicode(false);
 
-            modelBuilder.Entity<Account>().HasMany(e => e.Contests).
+            modelBuilder.Entity<Account>().HasMany(e => e.Drawings).
                 WithRequired(e => e.Account).WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Contest>().HasMany(e => e.Prizes).
-                WithRequired(e => e.Contest).WillCascadeOnDelete(false);
+            modelBuilder.Entity<Drawing>().HasMany(e => e.Prizes).
+                WithRequired(e => e.Drawing).WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Contest>().HasMany(e => e.Tickets).
-                WithRequired(e => e.Contest).WillCascadeOnDelete(false);
+            modelBuilder.Entity<Drawing>().HasMany(e => e.Tickets).
+                WithRequired(e => e.Drawing).WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Prize>().HasMany(e => e.Winners).
                 WithRequired(e => e.Prize).WillCascadeOnDelete(false);

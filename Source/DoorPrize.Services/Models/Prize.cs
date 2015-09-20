@@ -9,12 +9,12 @@ namespace DoorPrize.Services.Models
         public int Id { get; set; }
 
         [Required]
-        [Index("IX_Ticket_ContestId_Name", IsUnique = true, Order = 1)]
-        public int ContestId { get; set; }
+        [Index("IX_Ticket_DrawingId_Name", IsUnique = true, Order = 1)]
+        public int DrawingId { get; set; }
 
         [Required]
         [StringLength(50)]
-        [Index("IX_Ticket_ContestId_Name", IsUnique = true, Order = 2)]
+        [Index("IX_Ticket_DrawingId_Name", IsUnique = true, Order = 2)]
         public string Name { get; set; }
 
         [Required]
@@ -25,7 +25,7 @@ namespace DoorPrize.Services.Models
         [StringLength(50)]
         public string Provider { get; set; }
 
-        public virtual Contest Contest { get; set; }
+        public virtual Drawing Drawing { get; set; }
 
         public ICollection<Winner> Winners { get; set; }
     }

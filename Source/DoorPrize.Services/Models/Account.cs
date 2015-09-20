@@ -17,6 +17,6 @@ namespace DoorPrize.Services.Models
         [StringLength(50)]
         public string Name { get; set; }
 
-        public virtual ICollection<Contest> Contests { get; set; }
+        public virtual ICollection<Drawing> Drawings { get; set; }
     }
 }
