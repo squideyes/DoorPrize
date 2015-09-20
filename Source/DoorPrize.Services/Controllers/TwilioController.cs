@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml.Linq;
+using System.Linq;
 
 namespace DoorPrize.Services.Controllers
 {
@@ -161,6 +162,29 @@ namespace DoorPrize.Services.Controllers
                     WellKnown.TopicName, WellKnown.SubscriptionName);
             }
 
+            var prizesLeft = 0;
+            var ticketsLeft = 0;
+
+            using (var db = new Entities())
+            {
+                var prizes = await (from p in db.Prizes
+                                    where p.DrawingId == drawing.Id
+                                    select new
+                                    {
+                                        Quantity = p.Quantity - p.Winners.Count()
+                                    }).ToListAsync();
+
+                foreach (var prize in prizes)
+                {
+                    for (int i = 0; i < prize.Quantity; i++)
+                        prizesLeft++;
+                }
+
+                ticketsLeft = await (from t in db.Tickets
+                                         where t.DrawingId == drawing.Id && t.Winners.Count == 0
+                                         select t).CountAsync();
+            }
+
             var client = TopicClient.
                 CreateFromConnectionString(connString, WellKnown.TopicName);
 
@@ -169,8 +193,8 @@ namespace DoorPrize.Services.Controllers
                 AccountName = drawing.Account.Name,
                 AccountPhone = drawing.Account.Phone,
                 DrawingDate = drawing.Date,
-                PrizesLeft = 0,
-                TicketsLeft = 0
+                PrizesLeft = prizesLeft,
+                TicketsLeft = ticketsLeft
             });
 
             await client.SendAsync(message);

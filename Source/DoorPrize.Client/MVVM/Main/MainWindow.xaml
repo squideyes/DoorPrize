@@ -1,0 +1,92 @@
+﻿<Window x:Class="DoorPrize.Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DoorPrize.Client"
+        mc:Ignorable="d"
+        Title="{Binding Title}"
+        Height="400"
+        Width="760"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        SnapsToDevicePixels="True">
+    <Window.Resources>
+    </Window.Resources>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal">
+            <GroupBox Header="Instructions"
+                      Width="492">
+                <TextBlock TextWrapping="Wrap"
+                           FontSize="16">
+                    Send an SMS text to <Run FontWeight="Bold"
+                                             Text="{Binding DisplayPhone, Mode=OneWay}" />with your email and name separated by a comma (i.e. <Run FontWeight="Bold"
+                                                                                                                                                   Foreground="Red"
+                                                                                                                                                   Text="somedude@someco.com,Some Dude" />)
+                </TextBlock>
+            </GroupBox>
+            <GroupBox Header="Prizes"
+                      Width="55">
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Text="{Binding Prizes, Mode=OneWay}" />
+            </GroupBox>
+            <GroupBox Header="Tickets"
+                      Width="55">
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Text="{Binding Tickets, Mode=OneWay}" />
+            </GroupBox>
+            <GroupBox Header="Actions">
+                <UniformGrid Rows="1"
+                             Columns="2">
+                    <Button Content="Draw"
+                            Padding="8,0"
+                            Command="{Binding DrawCommand}" />
+                    <Button Content="Refresh"
+                            Padding="8,0"
+                            Command="{Binding RefreshCommand}" />
+                </UniformGrid>
+            </GroupBox>
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Margin="0,4,0,0"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="4"
+                BorderBrush="LightGray">
+            <DataGrid ItemsSource="{Binding GridInfos}"
+                      AutoGenerateColumns="False"
+                      CanUserResizeRows="False" CanUserAddRows="False" CanUserResizeColumns="False"
+                      CanUserSortColumns="False"
+                      CanUserReorderColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name"
+                                        Width="100"
+                                        IsReadOnly="True" />
+                    <DataGridTextColumn Header="Phone"
+                                        Width="100"
+                                        IsReadOnly="True" />
+                    <DataGridTextColumn Header="Email"
+                                        Width="150"
+                                        IsReadOnly="True" />
+                    <DataGridTextColumn Header="Prize"
+                                        Width="*"
+                                        IsReadOnly="True" />
+                    <DataGridCheckBoxColumn Header="Received"
+                                            Width="58" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</Window>

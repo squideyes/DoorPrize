@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DoorPrize.Initializer.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Uri" Type="System.Uri" Scope="Application">
+      <Value Profile="(Default)">http://localhost:57688/api/Twilio</Value>
+    </Setting>
+    <Setting Name="AccountPhone" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">+15705078275</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

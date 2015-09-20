@@ -45,6 +45,7 @@ namespace DoorPrize.Client.MVVM.Main
                 prizes = value;
 
                 NotifyPropertyChanged(vm => vm.Prizes);
+                NotifyPropertyChanged(vm => vm.DrawCommand);
             }
         }
 
@@ -70,7 +71,7 @@ namespace DoorPrize.Client.MVVM.Main
                     () =>
                     {
                     },
-                    () => true);
+                    () => Prizes > 0);
             }
         }
 
@@ -81,8 +82,7 @@ namespace DoorPrize.Client.MVVM.Main
                 return new DelegateCommand(
                     () =>
                     {
-                    },
-                    () => true);
+                    });
             }
         }
     }
