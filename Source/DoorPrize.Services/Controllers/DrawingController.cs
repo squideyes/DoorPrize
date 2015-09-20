@@ -1,5 +1,5 @@
 ﻿using DoorPrize.Services.Models;
-using DoorPrize.Services.Primatives;
+using DoorPrize.Shared;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;

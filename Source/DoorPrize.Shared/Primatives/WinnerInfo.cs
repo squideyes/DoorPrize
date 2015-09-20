@@ -1,4 +1,4 @@
-﻿namespace DoorPrize.Services.Primatives
+﻿namespace DoorPrize.Shared
 {
     public class WinnerInfo : DrawingInfo
     {

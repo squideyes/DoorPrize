@@ -1,28 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DoorPrize.Shared;
+using Microsoft.ServiceBus.Messaging;
+using Microsoft.WindowsAzure;
+using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DoorPrize.Client
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+
+            MonitorChanges();
+        }
+
+        private void MonitorChanges()
+        {
+            var connString = CloudConfigurationManager.
+                GetSetting("Microsoft.ServiceBus.ConnectionString");
+
+            var client = SubscriptionClient.CreateFromConnectionString(
+                connString, WellKnown.TopicName, WellKnown.SubscriptionName);
+
+            var options = new OnMessageOptions()
+            {
+                AutoComplete = false,
+                AutoRenewTimeout = TimeSpan.FromMinutes(1)
+            };
+
+            client.OnMessage((message) =>
+            {
+                try
+                {
+                    var body =  message.GetBody<DrawingInfo>();
+
+                    message.Complete();
+                }
+                catch (Exception)
+                {
+                    message.Abandon();
+                }
+            },
+            options);
         }
     }
 }

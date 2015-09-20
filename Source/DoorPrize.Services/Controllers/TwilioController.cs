@@ -1,4 +1,8 @@
 ﻿using DoorPrize.Services.Models;
+using DoorPrize.Shared;
+using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging;
+using Microsoft.WindowsAzure;
 using System;
 using System.Data.Entity;
 using System.Net;
@@ -114,6 +118,8 @@ namespace DoorPrize.Services.Controllers
 
                 await db.SaveChangesAsync();
 
+                await PublishDrawingInfo(drawing);
+
                 return GetResponse(REGISTERED, account.Name, drawing.Date);
             }
         }
@@ -129,6 +135,45 @@ namespace DoorPrize.Services.Controllers
                 xml.ToString(), Encoding.UTF8, "application/xml");
 
             return response;
+        }
+
+        private async Task PublishDrawingInfo(Drawing drawing)
+        {
+            var td = new TopicDescription(WellKnown.TopicName)
+            {
+                MaxSizeInMegabytes = 5120,
+                DefaultMessageTimeToLive = TimeSpan.FromHours(1)
+            };
+
+            var connString = CloudConfigurationManager.
+                GetSetting("Microsoft.ServiceBus.ConnectionString");
+
+            var namespaceManager =
+                NamespaceManager.CreateFromConnectionString(connString);
+
+            if (!await namespaceManager.TopicExistsAsync(WellKnown.TopicName))
+                await namespaceManager.CreateTopicAsync(td);
+
+            if (!namespaceManager.SubscriptionExists(
+                WellKnown.TopicName, WellKnown.SubscriptionName))
+            {
+                namespaceManager.CreateSubscription(
+                    WellKnown.TopicName, WellKnown.SubscriptionName);
+            }
+
+            var client = TopicClient.
+                CreateFromConnectionString(connString, WellKnown.TopicName);
+
+            var message = new BrokeredMessage(new DrawingInfo()
+            {
+                AccountName = drawing.Account.Name,
+                AccountPhone = drawing.Account.Phone,
+                DrawingDate = drawing.Date,
+                PrizesLeft = 0,
+                TicketsLeft = 0
+            });
+
+            await client.SendAsync(message);
         }
     }
 }
