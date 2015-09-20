@@ -2,6 +2,7 @@
 using DoorPrize.Services.Primatives;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -22,6 +23,65 @@ namespace DoorPrize.Services.Controllers
 
         private static Regex accountPhoneRegex = new Regex(@"^\d{10}$", RegexOptions.Compiled);
 
+        [HttpGet, Route("{accountPhone}/Info")]
+        public async Task<IHttpActionResult> GetInfo(string accountPhone)
+        {
+            if (!accountPhoneRegex.IsMatch(accountPhone))
+                return BadRequest("The \"accountPhone\" must be a 10-digit phone number.");
+
+            var today = DateTime.Today;
+
+            using (var db = new Entities())
+            {
+                var account = await db.Accounts.FirstOrDefaultAsync(a => a.Phone == accountPhone);
+
+                if (account == null)
+                {
+                    return BadRequest(string.Format(
+                        "The \"{0}\" accountPhone is invalid!", accountPhone));
+                }
+
+                var drawing = await db.Drawings.FirstOrDefaultAsync(d =>
+                    d.Account.Phone == accountPhone && d.Date == today);
+
+                if (drawing == null)
+                {
+                    return BadRequest(string.Format(
+                        "There is no {0} {1:MM/dd/yyyy} drawing.", account.Name, today));
+                }
+
+                var prizes = await (from p in db.Prizes
+                                    where p.DrawingId == drawing.Id
+                                    select new
+                                    {
+                                        Quantity = p.Quantity - p.Winners.Count()
+                                    }).ToListAsync();
+
+                var prizeCount = 0;
+
+                foreach (var prize in prizes)
+                {
+                    for (int i = 0; i < prize.Quantity; i++)
+                        prizeCount++;
+                }
+
+                var ticketCount = await (from t in db.Tickets
+                                         where t.DrawingId == drawing.Id && t.Winners.Count == 0
+                                         select t).CountAsync();
+
+                var drawingInfo = new DrawingInfo()
+                {
+                    AccountPhone = account.Phone,
+                    AccountName = account.Name,
+                    DrawingDate = drawing.Date,
+                    PrizesLeft = prizeCount,
+                    TicketsLeft = ticketCount
+                };
+
+                return Ok(drawingInfo);
+            }
+        }
+
         [HttpGet, Route("{accountPhone}")]
         public async Task<IHttpActionResult> Get(string accountPhone)
         {
@@ -32,7 +92,7 @@ namespace DoorPrize.Services.Controllers
 
             using (var db = new Entities())
             {
-                var account = db.Accounts.FirstOrDefault(a => a.Phone == accountPhone);
+                var account = await db.Accounts.FirstOrDefaultAsync(a => a.Phone == accountPhone);
 
                 if (account == null)
                 {
@@ -40,7 +100,7 @@ namespace DoorPrize.Services.Controllers
                         "The \"{0}\" accountPhone is invalid!", accountPhone));
                 }
 
-                var drawing = db.Drawings.FirstOrDefault(d =>
+                var drawing = await db.Drawings.FirstOrDefaultAsync(d =>
                     d.Account.Phone == accountPhone && d.Date == today);
 
                 if (drawing == null)
@@ -49,15 +109,15 @@ namespace DoorPrize.Services.Controllers
                         "There is no {0} {1:MM/dd/yyyy} drawing.", account.Name, today));
                 }
 
-                var prizes = from p in db.Prizes
-                             where p.DrawingId == drawing.Id
-                             select new
-                             {
-                                 PrizeId = p.Id,
-                                 PrizeName = p.Name,
-                                 Provider = p.Provider,
-                                 Quantity = p.Quantity - p.Winners.Count()
-                             };
+                var prizes = await (from p in db.Prizes
+                                    where p.DrawingId == drawing.Id
+                                    select new
+                                    {
+                                        PrizeId = p.Id,
+                                        PrizeName = p.Name,
+                                        Provider = p.Provider,
+                                        Quantity = p.Quantity - p.Winners.Count()
+                                    }).ToListAsync();
 
                 var prizeInfos = new List<PrizeInfo>();
 
@@ -80,17 +140,17 @@ namespace DoorPrize.Services.Controllers
 
                 var random = new Random();
 
-                var tickets = (from t in db.Tickets
-                               where t.DrawingId == drawing.Id && t.Winners.Count == 0
-                               select t).ToList();
+                var tickets = await (from t in db.Tickets
+                                     where t.DrawingId == drawing.Id && t.Winners.Count == 0
+                                     select t).ToListAsync();
 
                 if (tickets.Count == 0)
                     return Ok<WinnerInfo>(null);
 
                 var ticket = tickets[random.Next(tickets.Count)];
 
-                var prizeInfo = prizeInfos.OrderBy(i =>
-                    i.Guid).ToList()[random.Next(prizeInfos.Count)];
+                var prizeInfo = prizeInfos.
+                    OrderBy(i => i.Guid).ToList()[random.Next(prizeInfos.Count)];
 
                 var winner = new Winner()
                 {
@@ -105,12 +165,16 @@ namespace DoorPrize.Services.Controllers
 
                 var winnerInfo = new WinnerInfo()
                 {
-                    Prize = prizeInfo.Name,
-                    Provider = prizeInfo.Provider,
-                    Name = ticket.Name,
-                    Email = ticket.Email,
-                    Phone = ticket.Phone,
-                    Remaining = prizeInfos.Count - 1
+                    PrizeName = prizeInfo.Name,
+                    PrizeProvider = prizeInfo.Provider,
+                    TicketName = ticket.Name,
+                    TicketEmail = ticket.Email,
+                    TicketPhone = ticket.Phone,
+                    AccountPhone = account.Phone,
+                    AccountName = account.Name,
+                    DrawingDate = drawing.Date,
+                    PrizesLeft = prizeInfos.Count - 1,
+                    TicketsLeft = tickets.Count - 1
                 };
 
                 return Ok(winnerInfo);

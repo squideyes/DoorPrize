@@ -1,6 +1,6 @@
 ﻿using DoorPrize.Services.Models;
 using System;
-using System.Linq;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -67,12 +67,12 @@ namespace DoorPrize.Services.Controllers
 
             using (var db = new Entities())
             {
-                var account = db.Accounts.FirstOrDefault(a => a.Phone == to);
+                var account = await db.Accounts.FirstOrDefaultAsync(a => a.Phone == to);
 
                 if (account == null)
                     return GetResponse(BADPHONE, "To");
 
-                var drawing = db.Drawings.FirstOrDefault(
+                var drawing = await db.Drawings.FirstOrDefaultAsync(
                     c => c.AccountId == account.Id && c.Date == DateTime.Today);
 
                 if (drawing == null)
@@ -88,10 +88,10 @@ namespace DoorPrize.Services.Controllers
                     await db.SaveChangesAsync();
                 }
 
-                if (db.Winners.Any(w => w.Prize.DrawingId == drawing.Id))
+                if (await db.Winners.AnyAsync(w => w.Prize.DrawingId == drawing.Id))
                     return GetResponse(DRAWINGCLOSED, account.Name, drawing.Date);
 
-                var ticket = db.Tickets.FirstOrDefault(t =>
+                var ticket = await db.Tickets.FirstOrDefaultAsync(t =>
                     t.DrawingId == drawing.Id && t.Phone == from);
 
                 if (ticket == null)

@@ -110,6 +110,7 @@
     <Compile Include="Models\Prize.cs" />
     <Compile Include="Models\Ticket.cs" />
     <Compile Include="Models\Winner.cs" />
+    <Compile Include="Primatives\DrawingInfo.cs" />
     <Compile Include="Primatives\WinnerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

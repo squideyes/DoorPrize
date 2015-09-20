@@ -1,12 +1,11 @@
 ﻿namespace DoorPrize.Services.Primatives
 {
-    public class WinnerInfo
+    public class WinnerInfo : DrawingInfo
     {
-        public string Prize { get; set; }
-        public string Provider { get; set; }
-        public string Phone { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public int Remaining { get; set; }
+        public string PrizeName { get; set; }
+        public string PrizeProvider { get; set; }
+        public string TicketPhone { get; set; }
+        public string TicketName { get; set; }
+        public string TicketEmail { get; set; }
     }
 }
