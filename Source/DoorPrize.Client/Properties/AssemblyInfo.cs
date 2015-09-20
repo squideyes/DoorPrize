@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("DoorPrize.Client")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("SquidEyes, LLC")]
 [assembly: AssemblyProduct("DoorPrize.Client")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("© 2015 SquidEyes, LLC.  All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

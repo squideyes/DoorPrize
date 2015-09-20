@@ -1,17 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DoorPrize.Client.MVVM.Main;
+using DoorPrize.GUI;
+using System;
 using System.Windows;
 
 namespace DoorPrize.Client
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs sea)
+        {
+            DispatcherUnhandledException += (s, e) => 
+                Modal.FailureDialog(e.Exception.Message);
+
+            try
+            {
+                ShutdownMode = ShutdownMode.OnLastWindowClose;
+
+                MainRunner.Run();
+            }
+            catch (Exception error)
+            {
+                Modal.FailureDialog(error.Message);
+            }
+        }
     }
 }
