@@ -81,14 +81,7 @@ namespace DoorPrize.Client.MVVM.Main
                     {
                         var info = await RestHelper.GetWinnerInfo();
 
-                        GridInfos.Add(new GridInfo()
-                        {
-                            Email = info.TicketEmail,
-                            Name = info.TicketName,
-                            Phone = info.TicketPhone,
-                            Prize = string.Format("{0} ({1})", 
-                                info.PrizeName, info.PrizeProvider)
-                        });
+                        GridInfos.Add(GetGridInfo(info));
 
                         await UpdatePrizesAndTicketsLeft();
 
@@ -98,13 +91,36 @@ namespace DoorPrize.Client.MVVM.Main
             }
         }
 
+        private GridInfo GetGridInfo(WinnerInfo info)
+        {
+            return new GridInfo()
+            {
+                Email = info.TicketEmail,
+                Name = info.TicketName,
+                Phone = info.TicketPhone,
+                Prize = string.Format("{0} ({1})",
+                info.PrizeName, info.PrizeProvider)
+            };
+        }
+
         public DelegateCommand RefreshCommand
         {
             get
             {
                 return new DelegateCommand(
-                    () =>
+                    async () =>
                     {
+                        GridInfos.Clear();
+
+                        var infos = await RestHelper.GetWinnerInfos();
+
+                        foreach(var info in infos)
+                            GridInfos.Add(GetGridInfo(info));
+
+                        await UpdatePrizesAndTicketsLeft();
+
+                        NotifyPropertyChanged(vm => vm.DrawCommand);
+
                     });
             }
         }

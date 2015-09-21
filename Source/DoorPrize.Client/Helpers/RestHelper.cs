@@ -1,6 +1,7 @@
 ﻿using DoorPrize.Shared;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -35,9 +36,35 @@ namespace DoorPrize.Client.Helpers
 
             return result;
         }
+
         public static async Task<WinnerInfo> GetWinnerInfo()
         {
             WinnerInfo winnerInfo;
+
+            using (var handler = new HttpClientHandler { UseProxy = false })
+            {
+                using (var httpClient = new HttpClient(handler))
+                {
+                    httpClient.BaseAddress = Properties.Settings.Default.DrawingUri;
+
+                    using (HttpResponseMessage response = await httpClient.GetAsync(
+                        string.Format("{0}/Winner", Properties.Settings.Default.AccountPhone)))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            winnerInfo = JsonConvert.DeserializeObject<WinnerInfo>(
+                                await content.ReadAsStringAsync());
+                        }
+                    }
+                }
+            }
+
+            return winnerInfo;
+        }
+
+        public static async Task<List<WinnerInfo>> GetWinnerInfos()
+        {
+            List<WinnerInfo> winnerInfos;
 
             using (var handler = new HttpClientHandler { UseProxy = false })
             {
@@ -50,14 +77,14 @@ namespace DoorPrize.Client.Helpers
                     {
                         using (HttpContent content = response.Content)
                         {
-                            winnerInfo = JsonConvert.DeserializeObject<WinnerInfo>(
+                            winnerInfos = JsonConvert.DeserializeObject<List<WinnerInfo>>(
                                 await content.ReadAsStringAsync());
                         }
                     }
                 }
             }
 
-            return winnerInfo;
+            return winnerInfos;
         }
     }
 }
