@@ -14,6 +14,8 @@ namespace DoorPrize.Initializer
         {
             try
             {
+                var startedOn = DateTime.UtcNow;
+
                 using (var handler = new HttpClientHandler { UseProxy = false })
                 {
                     using (var client = new HttpClient(handler))
@@ -38,6 +40,11 @@ namespace DoorPrize.Initializer
                         }
                     }
                 }
+
+                var elapsed = DateTime.UtcNow - startedOn;
+
+                Console.WriteLine();
+                Console.WriteLine("Elapsed: " + elapsed);
             }
             catch (Exception error)
             {

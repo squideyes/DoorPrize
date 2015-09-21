@@ -119,7 +119,27 @@ namespace DoorPrize.Services.Controllers
 
                 await db.SaveChangesAsync();
 
-                await PublishDrawingInfo(drawing);
+                int prizesLeft = 0;
+                int ticketsLeft = 0;
+
+                var prizes = await (from p in db.Prizes
+                                    where p.DrawingId == drawing.Id
+                                    select new
+                                    {
+                                        Quantity = p.Quantity - p.Winners.Count()
+                                    }).ToListAsync();
+
+                foreach (var prize in prizes)
+                {
+                    for (int i = 0; i < prize.Quantity; i++)
+                        prizesLeft++;
+                }
+
+                ticketsLeft = await (from t in db.Tickets
+                                     where t.DrawingId == drawing.Id && t.Winners.Count == 0
+                                     select t).CountAsync();
+
+                Task.Run(() => PublishDrawingInfo(drawing, prizesLeft, ticketsLeft));
 
                 return GetResponse(REGISTERED, account.Name, drawing.Date);
             }
@@ -138,52 +158,10 @@ namespace DoorPrize.Services.Controllers
             return response;
         }
 
-        private async Task PublishDrawingInfo(Drawing drawing)
+        private void PublishDrawingInfo(Drawing drawing, int prizesLeft, int ticketsLeft)
         {
-            var td = new TopicDescription(WellKnown.TopicName)
-            {
-                MaxSizeInMegabytes = 5120,
-                DefaultMessageTimeToLive = TimeSpan.FromHours(1)
-            };
-
             var connString = CloudConfigurationManager.
                 GetSetting("Microsoft.ServiceBus.ConnectionString");
-
-            var namespaceManager =
-                NamespaceManager.CreateFromConnectionString(connString);
-
-            if (!await namespaceManager.TopicExistsAsync(WellKnown.TopicName))
-                await namespaceManager.CreateTopicAsync(td);
-
-            if (!namespaceManager.SubscriptionExists(
-                WellKnown.TopicName, WellKnown.SubscriptionName))
-            {
-                namespaceManager.CreateSubscription(
-                    WellKnown.TopicName, WellKnown.SubscriptionName);
-            }
-
-            var prizesLeft = 0;
-            var ticketsLeft = 0;
-
-            using (var db = new Entities())
-            {
-                var prizes = await (from p in db.Prizes
-                                    where p.DrawingId == drawing.Id
-                                    select new
-                                    {
-                                        Quantity = p.Quantity - p.Winners.Count()
-                                    }).ToListAsync();
-
-                foreach (var prize in prizes)
-                {
-                    for (int i = 0; i < prize.Quantity; i++)
-                        prizesLeft++;
-                }
-
-                ticketsLeft = await (from t in db.Tickets
-                                         where t.DrawingId == drawing.Id && t.Winners.Count == 0
-                                         select t).CountAsync();
-            }
 
             var client = TopicClient.
                 CreateFromConnectionString(connString, WellKnown.TopicName);
@@ -197,7 +175,7 @@ namespace DoorPrize.Services.Controllers
                 TicketsLeft = ticketsLeft
             });
 
-            await client.SendAsync(message);
+            client.Send(message);
         }
     }
 }
