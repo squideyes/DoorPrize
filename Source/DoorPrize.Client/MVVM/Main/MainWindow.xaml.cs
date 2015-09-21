@@ -11,38 +11,6 @@ namespace DoorPrize.Client
         public MainWindow()
         {
             InitializeComponent();
-
-            MonitorChanges();
-        }
-
-        private void MonitorChanges()
-        {
-            var connString = CloudConfigurationManager.
-                GetSetting("Microsoft.ServiceBus.ConnectionString");
-
-            var client = SubscriptionClient.CreateFromConnectionString(
-                connString, WellKnown.TopicName, WellKnown.SubscriptionName);
-
-            var options = new OnMessageOptions()
-            {
-                AutoComplete = false,
-                AutoRenewTimeout = TimeSpan.FromMinutes(1)
-            };
-
-            client.OnMessage((message) =>
-            {
-                try
-                {
-                    var body =  message.GetBody<DrawingInfo>();
-
-                    message.Complete();
-                }
-                catch (Exception)
-                {
-                    message.Abandon();
-                }
-            },
-            options);
         }
     }
 }

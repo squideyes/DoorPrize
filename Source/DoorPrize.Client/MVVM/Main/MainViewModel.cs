@@ -1,6 +1,10 @@
 ﻿using DoorPrize.Client.Helpers;
 using DoorPrize.Client.Primatives;
 using DoorPrize.GUI;
+using DoorPrize.Shared;
+using Microsoft.ServiceBus.Messaging;
+using Microsoft.WindowsAzure;
+using System;
 using System.ComponentModel;
 
 namespace DoorPrize.Client.MVVM.Main
@@ -14,6 +18,8 @@ namespace DoorPrize.Client.MVVM.Main
             : base(model)
         {
             GridInfos = new BindingList<GridInfo>();
+
+            MonitorChanges();
         }
 
         public BindingList<GridInfo> GridInfos { get; }
@@ -84,6 +90,41 @@ namespace DoorPrize.Client.MVVM.Main
                     {
                     });
             }
+        }
+
+        private void MonitorChanges()
+        {
+            var connString = CloudConfigurationManager.
+                GetSetting("Microsoft.ServiceBus.ConnectionString");
+
+            var client = SubscriptionClient.CreateFromConnectionString(
+                connString, WellKnown.TopicName, WellKnown.SubscriptionName);
+
+            var options = new OnMessageOptions()
+            {
+                AutoComplete = false,
+                AutoRenewTimeout = TimeSpan.FromMinutes(1)
+            };
+
+            client.OnMessage((message) =>
+            {
+                try
+                {
+                    var body = message.GetBody<DrawingInfo>();
+
+                    message.Complete();
+
+                    Prizes = body.PrizesLeft;
+                    Tickets = body.TicketsLeft;
+                }
+                catch (Exception error)
+                {
+                    // The error should be logged!!!!!!!!!!!!!!!!!!!!
+
+                    message.Abandon();
+                }
+            },
+            options);
         }
     }
 }
