@@ -139,7 +139,9 @@ namespace DoorPrize.Services.Controllers
                                      where t.DrawingId == drawing.Id && t.Winners.Count == 0
                                      select t).CountAsync();
 
+#pragma warning disable CS4014
                 Task.Run(() => PublishDrawingInfo(drawing, prizesLeft, ticketsLeft));
+#pragma warning restore CS414
 
                 return GetResponse(REGISTERED, account.Name, drawing.Date);
             }
