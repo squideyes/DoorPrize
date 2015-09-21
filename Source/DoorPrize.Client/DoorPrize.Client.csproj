@@ -78,6 +78,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helpers\Global.cs" />
+    <Compile Include="Helpers\RestHelper.cs" />
     <Compile Include="MVVM\Main\MainModel.cs" />
     <Compile Include="MVVM\Main\MainRunner.cs" />
     <Compile Include="MVVM\Main\MainViewModel.cs" />

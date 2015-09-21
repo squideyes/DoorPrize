@@ -8,13 +8,14 @@ using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace DoorPrize.Client.MVVM.Main
 {
     public class MainViewModel : ViewModelBase<MainViewModel, MainModel>
     {
-        private int prizes;
-        private int tickets;
+        private int prizesLeft;
+        private int ticketsLeft;
 
         public MainViewModel(MainModel model)
             : base(model)
@@ -42,32 +43,32 @@ namespace DoorPrize.Client.MVVM.Main
             }
         }
 
-        public int Prizes
+        public int PrizesLeft
         {
             get
             {
-                return prizes;
+                return prizesLeft;
             }
             set
             {
-                prizes = value;
+                prizesLeft = value;
 
-                NotifyPropertyChanged(vm => vm.Prizes);
+                NotifyPropertyChanged(vm => vm.PrizesLeft);
                 NotifyPropertyChanged(vm => vm.DrawCommand);
             }
         }
 
-        public int Tickets
+        public int TicketsLeft
         {
             get
             {
-                return tickets;
+                return ticketsLeft;
             }
             set
             {
-                tickets = value;
+                ticketsLeft = value;
 
-                NotifyPropertyChanged(vm => vm.Tickets);
+                NotifyPropertyChanged(vm => vm.TicketsLeft);
             }
         }
 
@@ -76,10 +77,24 @@ namespace DoorPrize.Client.MVVM.Main
             get
             {
                 return new DelegateCommand(
-                    () =>
+                    async () =>
                     {
+                        var info = await RestHelper.GetWinnerInfo();
+
+                        GridInfos.Add(new GridInfo()
+                        {
+                            Email = info.TicketEmail,
+                            Name = info.TicketName,
+                            Phone = info.TicketPhone,
+                            Prize = string.Format("{0} ({1})", 
+                                info.PrizeName, info.PrizeProvider)
+                        });
+
+                        await UpdatePrizesAndTicketsLeft();
+
+                        NotifyPropertyChanged(vm => vm.DrawCommand);
                     },
-                    () => Prizes > 0);
+                    () => (PrizesLeft > 0) && (TicketsLeft > 0));
             }
         }
 
@@ -116,26 +131,7 @@ namespace DoorPrize.Client.MVVM.Main
 
                     message.Complete();
 
-                    using (var handler = new HttpClientHandler { UseProxy = false })
-                    {
-                        using (var httpClient = new HttpClient(handler))
-                        {
-                            httpClient.BaseAddress = Properties.Settings.Default.DrawingUri;
-
-                            using (HttpResponseMessage response = await httpClient.GetAsync(
-                                string.Format("{0}/Info", Properties.Settings.Default.AccountPhone)))
-                            {
-                                using (HttpContent content = response.Content)
-                                {
-                                    var drawingInfo = JsonConvert.DeserializeObject<DrawingInfo>(
-                                        await content.ReadAsStringAsync());
-
-                                    Prizes = drawingInfo.PrizesLeft;
-                                    Tickets = drawingInfo.TicketsLeft;
-                                }
-                            }
-                        }
-                    }
+                    await UpdatePrizesAndTicketsLeft();
                 }
                 catch (Exception error)
                 {
@@ -145,6 +141,14 @@ namespace DoorPrize.Client.MVVM.Main
                 }
             },
             options);
+        }
+
+        private async Task UpdatePrizesAndTicketsLeft()
+        {
+            var tuple = await RestHelper.GetPrizesAndTicketsLeft();
+
+            PrizesLeft = tuple.Item1;
+            TicketsLeft = tuple.Item2;
         }
     }
 }

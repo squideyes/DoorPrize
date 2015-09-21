@@ -36,7 +36,7 @@
                            VerticalAlignment="Center"
                            FontSize="32"
                            FontWeight="Bold"
-                           Text="{Binding Prizes, Mode=OneWay}" />
+                           Text="{Binding PrizesLeft, Mode=OneWay}" />
             </GroupBox>
             <GroupBox Header="Tickets"
                       Width="55">
@@ -44,7 +44,7 @@
                            VerticalAlignment="Center"
                            FontSize="32"
                            FontWeight="Bold"
-                           Text="{Binding Tickets, Mode=OneWay}" />
+                           Text="{Binding TicketsLeft, Mode=OneWay}" />
             </GroupBox>
             <GroupBox Header="Actions">
                 <UniformGrid Rows="1"
@@ -72,19 +72,23 @@
                       CanUserReorderColumns="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name"
-                                        Width="100"
-                                        IsReadOnly="True" />
+                                        Width="150"
+                                        IsReadOnly="True" Binding="{Binding Name}" />
                     <DataGridTextColumn Header="Phone"
                                         Width="100"
-                                        IsReadOnly="True" />
+                                        IsReadOnly="True"
+                                        Binding="{Binding Phone}" />
                     <DataGridTextColumn Header="Email"
                                         Width="150"
-                                        IsReadOnly="True" />
+                                        IsReadOnly="True"
+                                        Binding="{Binding Email}" />
                     <DataGridTextColumn Header="Prize"
                                         Width="*"
-                                        IsReadOnly="True" />
+                                        IsReadOnly="True"
+                                        Binding="{Binding Prize}" />
                     <DataGridCheckBoxColumn Header="Received"
-                                            Width="58" />
+                                            Width="58"
+                                            Binding="{Binding Received}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
