@@ -4,8 +4,10 @@ using DoorPrize.GUI;
 using DoorPrize.Shared;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure;
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
+using System.Net.Http;
 
 namespace DoorPrize.Client.MVVM.Main
 {
@@ -97,7 +99,7 @@ namespace DoorPrize.Client.MVVM.Main
             var connString = CloudConfigurationManager.
                 GetSetting("Microsoft.ServiceBus.ConnectionString");
 
-            var client = SubscriptionClient.CreateFromConnectionString(
+            var busClient = SubscriptionClient.CreateFromConnectionString(
                 connString, WellKnown.TopicName, WellKnown.SubscriptionName);
 
             var options = new OnMessageOptions()
@@ -106,7 +108,7 @@ namespace DoorPrize.Client.MVVM.Main
                 AutoRenewTimeout = TimeSpan.FromMinutes(1)
             };
 
-            client.OnMessage((message) =>
+            busClient.OnMessage(async (message) =>
             {
                 try
                 {
@@ -114,8 +116,26 @@ namespace DoorPrize.Client.MVVM.Main
 
                     message.Complete();
 
-                    Prizes = body.PrizesLeft;
-                    Tickets = body.TicketsLeft;
+                    using (var handler = new HttpClientHandler { UseProxy = false })
+                    {
+                        using (var httpClient = new HttpClient(handler))
+                        {
+                            httpClient.BaseAddress = Properties.Settings.Default.DrawingUri;
+
+                            using (HttpResponseMessage response = await httpClient.GetAsync(
+                                string.Format("{0}/Info", Properties.Settings.Default.AccountPhone)))
+                            {
+                                using (HttpContent content = response.Content)
+                                {
+                                    var drawingInfo = JsonConvert.DeserializeObject<DrawingInfo>(
+                                        await content.ReadAsStringAsync());
+
+                                    Prizes = drawingInfo.PrizesLeft;
+                                    Tickets = drawingInfo.TicketsLeft;
+                                }
+                            }
+                        }
+                    }
                 }
                 catch (Exception error)
                 {

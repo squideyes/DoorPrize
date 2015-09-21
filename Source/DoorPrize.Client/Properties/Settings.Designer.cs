@@ -25,10 +25,22 @@ namespace DoorPrize.Client.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5705078275 ")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5705078275")]
         public string AccountPhone {
             get {
                 return ((string)(this["AccountPhone"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:57688/api/Drawing/")]
+        public global::System.Uri DrawingUri {
+            get {
+                return ((global::System.Uri)(this["DrawingUri"]));
+            }
+            set {
+                this["DrawingUri"] = value;
             }
         }
     }

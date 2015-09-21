@@ -3,7 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="AccountPhone" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">5705078275 </Value>
+      <Value Profile="(Default)">5705078275</Value>
+    </Setting>
+    <Setting Name="DrawingUri" Type="System.Uri" Scope="User">
+      <Value Profile="(Default)">http://localhost:57688/api/Drawing/</Value>
     </Setting>
   </Settings>
 </SettingsFile>
