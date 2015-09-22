@@ -34,7 +34,7 @@ namespace DoorPrize.Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:57688/api/Drawing/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://doorprize.azurewebsites.net/api/Drawing/")]
         public global::System.Uri DrawingUri {
             get {
                 return ((global::System.Uri)(this["DrawingUri"]));

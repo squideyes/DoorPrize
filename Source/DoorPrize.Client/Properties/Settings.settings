@@ -6,7 +6,7 @@
       <Value Profile="(Default)">5705078275</Value>
     </Setting>
     <Setting Name="DrawingUri" Type="System.Uri" Scope="User">
-      <Value Profile="(Default)">http://localhost:57688/api/Drawing/</Value>
+      <Value Profile="(Default)">http://doorprize.azurewebsites.net/api/Drawing/</Value>
     </Setting>
   </Settings>
 </SettingsFile>
