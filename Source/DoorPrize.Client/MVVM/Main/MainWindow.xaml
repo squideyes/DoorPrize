@@ -70,6 +70,12 @@
                       CanUserResizeRows="False" CanUserAddRows="False" CanUserResizeColumns="False"
                       CanUserSortColumns="False"
                       CanUserReorderColumns="False">
+                <DataGrid.ItemContainerStyle>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Setter Property="Background"
+                                Value="{Binding Background, Mode=OneWay}" />
+                    </Style>
+                </DataGrid.ItemContainerStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name"
                                         Width="150"

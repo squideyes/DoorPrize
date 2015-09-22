@@ -1,10 +1,10 @@
-﻿using DoorPrize.Services.Models;
+﻿using DoorPrize.Services.Helpers;
+using DoorPrize.Services.Models;
 using DoorPrize.Shared;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
-using Microsoft.WindowsAzure;
 using System;
 using System.Data.Entity;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -13,7 +13,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml.Linq;
-using System.Linq;
 
 namespace DoorPrize.Services.Controllers
 {
@@ -162,12 +161,6 @@ namespace DoorPrize.Services.Controllers
 
         private void PublishDrawingInfo(Drawing drawing, int prizesLeft, int ticketsLeft)
         {
-            var connString = CloudConfigurationManager.
-                GetSetting("Microsoft.ServiceBus.ConnectionString");
-
-            var client = TopicClient.
-                CreateFromConnectionString(connString, WellKnown.TopicName);
-
             var message = new BrokeredMessage(new DrawingInfo()
             {
                 AccountName = drawing.Account.Name,
@@ -177,7 +170,7 @@ namespace DoorPrize.Services.Controllers
                 TicketsLeft = ticketsLeft
             });
 
-            client.Send(message);
+            BusHelper.GetTopicClient().SendAsync(message);
         }
     }
 }

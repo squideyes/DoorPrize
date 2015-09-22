@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace DoorPrize.Client.MVVM.Main
 {
@@ -72,26 +73,7 @@ namespace DoorPrize.Client.MVVM.Main
             }
         }
 
-        public DelegateCommand DrawCommand
-        {
-            get
-            {
-                return new DelegateCommand(
-                    async () =>
-                    {
-                        var info = await RestHelper.GetWinnerInfo();
-
-                        GridInfos.Add(GetGridInfo(info));
-
-                        await UpdatePrizesAndTicketsLeft();
-
-                        NotifyPropertyChanged(vm => vm.DrawCommand);
-                    },
-                    () => (PrizesLeft > 0) && (TicketsLeft > 0));
-            }
-        }
-
-        private GridInfo GetGridInfo(WinnerInfo info)
+        private GridInfo GetGridInfo(WinnerInfo info, Color background)
         {
             return new GridInfo()
             {
@@ -99,8 +81,31 @@ namespace DoorPrize.Client.MVVM.Main
                 Name = info.TicketName,
                 Phone = info.TicketPhone,
                 Prize = string.Format("{0} ({1})",
-                info.PrizeName, info.PrizeProvider)
+                info.PrizeName, info.PrizeProvider),
+                Background = background
             };
+        }
+
+        public DelegateCommand DrawCommand
+        {
+            get
+            {
+                return new DelegateCommand(
+                    async () =>
+                    {
+                        var winnerInfo = await RestHelper.GetWinnerInfo();
+
+                        foreach (var gridInfo in GridInfos)
+                            gridInfo.Background = Colors.White;
+
+                        GridInfos.Add(GetGridInfo(winnerInfo, Colors.Cyan));
+
+                        await UpdatePrizesAndTicketsLeft();
+
+                        NotifyPropertyChanged(vm => vm.DrawCommand);
+                    },
+                    () => (PrizesLeft > 0) && (TicketsLeft > 0));
+            }
         }
 
         public DelegateCommand RefreshCommand
@@ -112,15 +117,17 @@ namespace DoorPrize.Client.MVVM.Main
                     {
                         GridInfos.Clear();
 
-                        var infos = await RestHelper.GetWinnerInfos();
+                        var winnerInfos = await RestHelper.GetWinnerInfos();
 
-                        foreach(var info in infos)
-                            GridInfos.Add(GetGridInfo(info));
+                        for (int i = 0; i < winnerInfos.Count; i++)
+                        {
+                            GridInfos.Add(GetGridInfo(winnerInfos[i],
+                                i == winnerInfos.Count - 1 ? Colors.Cyan : Colors.White));
+                        }
 
                         await UpdatePrizesAndTicketsLeft();
 
                         NotifyPropertyChanged(vm => vm.DrawCommand);
-
                     });
             }
         }
