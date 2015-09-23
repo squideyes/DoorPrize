@@ -57,14 +57,14 @@ namespace DoorPrize.Services.Controllers
             if (parts.Length != 2)
                 return GetResponse(BADBODY, from);
 
-            if (!emailRegex.IsMatch(parts[0]))
+            var email = parts[0].Trim();
+            var name = parts[1].Trim();
+
+            if (!emailRegex.IsMatch(email))
                 return GetResponse(BADBODY, from);
 
-            if (string.IsNullOrWhiteSpace(parts[1]))
+            if (string.IsNullOrWhiteSpace(name))
                 return GetResponse(BADBODY, from);
-
-            var email = parts[0];
-            var name = parts[1];
 
             to = to.Substring(2);
             from = from.Substring(2);

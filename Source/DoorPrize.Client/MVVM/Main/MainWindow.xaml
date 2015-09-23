@@ -25,7 +25,7 @@
                 <TextBlock TextWrapping="Wrap"
                            FontSize="16">
                     Send an SMS text to <Run FontWeight="Bold"
-                                             Text="{Binding DisplayPhone, Mode=OneWay}" />with your email and name separated by a comma (i.e. <Run FontWeight="Bold"
+                                             Text="{Binding DisplayPhone, Mode=OneWay}" /> with your email and name separated by a comma (i.e. <Run FontWeight="Bold"
                                                                                                                                                    Foreground="Red"
                                                                                                                                                    Text="somedude@someco.com,Some Dude" />)
                 </TextBlock>

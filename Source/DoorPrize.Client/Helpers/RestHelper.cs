@@ -77,8 +77,9 @@ namespace DoorPrize.Client.Helpers
                     {
                         using (HttpContent content = response.Content)
                         {
-                            winnerInfos = JsonConvert.DeserializeObject<List<WinnerInfo>>(
-                                await content.ReadAsStringAsync());
+                            var json = await content.ReadAsStringAsync();
+
+                            winnerInfos = JsonConvert.DeserializeObject<List<WinnerInfo>>(json);
                         }
                     }
                 }
